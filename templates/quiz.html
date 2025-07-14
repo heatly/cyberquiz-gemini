@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/static/style.css">
+  <title>Quiz</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Answer the Questions</h1>
+    <form method="POST" action="/submit">
+      {% for q in questions %}
+        <div class="question-block">
+          <h5>{{ loop.index }}. {{ q.q }}</h5>
+          {% for opt in q.options %}
+            <label><input type="checkbox" name="q{{ loop.index0 }}" value="{{ opt }}"> {{ opt }}</label><br>
+          {% endfor %}
+        </div>
+        <hr>
+      {% endfor %}
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</body>
+</html>

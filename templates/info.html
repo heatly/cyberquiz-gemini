@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/static/style.css">
+  <title>Start Quiz</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Cybersecurity GRC Quiz</h1>
+    <form method="POST" action="/start">
+      <label>Name:</label>
+      <input name="name" required>
+      <label>Position:</label>
+      <input name="position" required>
+      <label>Company:</label>
+      <input name="company" required>
+      <label>Startup or MNC:</label>
+      <input name="type" required>
+      <label>Email:</label>
+      <input name="email" type="email" required>
+      <button type="submit">Start Quiz</button>
+    </form>
+  </div>
+</body>
+</html>
