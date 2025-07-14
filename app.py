@@ -10,7 +10,7 @@ genai.configure(api_key="AIzaSyAK4b3JlZQNZOOdR6jpJiyFakan5YUNcBY")
 app = Flask(__name__)
 app.secret_key = 'quiz-secret'
 
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-1.0-pro-002")
 
 questions = [
     {
