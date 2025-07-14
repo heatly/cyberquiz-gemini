@@ -146,9 +146,10 @@ def email_pdf(to_email, pdf_data):
     msg.add_attachment(pdf_data, maintype='application', subtype='pdf', filename='GRC_Report.pdf')
 
     # Replace with real credentials and SMTP server
-    with smtplib.SMTP_SSL('smtp.example.com', 465) as smtp:
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
         smtp.login("balajinagarajan6122003@gmail.com", "jghn jbqq voim hsue")
         smtp.send_message(msg)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
