@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, session, send_file
 import google.generativeai as genai
-import os
-from dotenv import load_dotenv
 from fpdf import FPDF
 from io import BytesIO
+import os
 
-load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# ✅ Directly hardcoded Gemini API key here (unsafe for production, okay for personal/demo use)
+genai.configure(api_key="AIzaSyAK4b3JlZQNZOOdR6jpJiyFakan5YUNcBY")
+
 app = Flask(__name__)
 app.secret_key = 'quiz-secret'
 
@@ -71,10 +71,13 @@ def submit():
 
         Give a risk score from 1 (bad) to 5 (excellent), justify the score, map to NIST CSF category, and give 2 improvement suggestions.
         """
-        response = model.generate_content(prompt).text
+        try:
+            response = model.generate_content(prompt).text
+        except Exception as e:
+            print("❌ Gemini API Error:", str(e))
+            response = "Error analyzing response. Please check API key or input."
         results.append(response)
 
-        # Basic score extract logic
         score = 0
         for line in response.splitlines():
             if "score" in line.lower():
