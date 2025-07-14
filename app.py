@@ -3,14 +3,15 @@ import google.generativeai as genai
 from fpdf import FPDF
 from io import BytesIO
 import os
-
-# ✅ Directly hardcoded Gemini API key here (unsafe for production, okay for personal/demo use)
-genai.configure(api_key="AIzaSyAK4b3JlZQNZOOdR6jpJiyFakan5YUNcBY")
+import smtplib
+from email.message import EmailMessage
 
 app = Flask(__name__)
 app.secret_key = 'quiz-secret'
 
-model = genai.GenerativeModel("gemini-1.0-pro-002")
+# 🔐 Hardcoded Gemini API key (safe only in private/development)
+genai.configure(api_key="AIzaSyAK4b3JlZQNZOOdR6jpJiyFakan5YUNcBY")
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
 questions = [
     {
@@ -52,7 +53,8 @@ def start_quiz():
         "name": request.form["name"],
         "position": request.form["position"],
         "company": request.form["company"],
-        "type": request.form["type"]
+        "type": request.form["type"],
+        "email": request.form["email"]
     }
     return render_template("quiz.html", questions=questions)
 
@@ -69,13 +71,14 @@ def submit():
         Question: {q["q"]}
         Selected: {selected}
 
-        Give a risk score from 1 (bad) to 5 (excellent), justify the score, map to NIST CSF category, and give 2 improvement suggestions.
+        Give a GRC score from 1 (bad) to 5 (excellent), justify the score, map to NIST CSF category, and give 2 improvement suggestions.
         """
         try:
             response = model.generate_content(prompt).text
         except Exception as e:
             print("❌ Gemini API Error:", str(e))
             response = "Error analyzing response. Please check API key or input."
+
         results.append(response)
 
         score = 0
@@ -102,12 +105,12 @@ def report():
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", "B", 14)
-    pdf.cell(0, 10, "Cybersecurity AI Quiz Report", ln=True, align='C')
+    pdf.cell(0, 10, "Cybersecurity GRC Quiz Report", ln=True, align='C')
     pdf.ln(5)
     pdf.set_font("Arial", "", 12)
     pdf.cell(0, 10, f"Name: {user.get('name')} | Position: {user.get('position')}", ln=True)
     pdf.cell(0, 10, f"Company: {user.get('company')} ({user.get('type')})", ln=True)
-    pdf.cell(0, 10, f"Total Risk Score: {score}/{len(questions)*5}", ln=True)
+    pdf.cell(0, 10, f"GRC Score: {score}/{len(questions)*5}", ln=True)
     pdf.ln(5)
 
     for q_text, selected, analysis in score_details:
@@ -125,9 +128,27 @@ def report():
     pdf.cell(0, 10, "Website: https://digitalxforce.com", ln=True)
 
     pdf_bytes = pdf.output(dest='S').encode('latin1')
-    pdf_output = BytesIO(pdf_bytes)
-    return send_file(pdf_output, download_name="Cybersecurity_Report.pdf", as_attachment=True)
 
+    try:
+        email_pdf(user.get('email'), pdf_bytes)
+    except Exception as e:
+        print("❌ Email failed:", str(e))
+
+    return send_file(BytesIO(pdf_bytes), download_name="GRC_Report.pdf", as_attachment=True)
+
+def email_pdf(to_email, pdf_data):
+    msg = EmailMessage()
+    msg['Subject'] = 'Your Cybersecurity GRC Quiz Report'
+    msg['From'] = "balajinagarajan6122003@gmail.com"
+    msg['To'] = to_email
+    msg.set_content("Hello,\n\nAttached is your cybersecurity GRC score report.\n\nRegards,\nDigitalxforce")
+
+    msg.add_attachment(pdf_data, maintype='application', subtype='pdf', filename='GRC_Report.pdf')
+
+    # Replace with real credentials and SMTP server
+    with smtplib.SMTP_SSL('smtp.example.com', 465) as smtp:
+        smtp.login("balajinagarajan6122003@gmail.com", "jghn jbqq voim hsue")
+        smtp.send_message(msg)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
