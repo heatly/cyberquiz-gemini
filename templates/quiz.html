@@ -12,7 +12,7 @@
       <strong>{{ loop.index }}. {{ q.q }}</strong><br>
       {% for opt in q.options %}
       <div class="form-check">
-        <input class="form-check-input" type="radio" name="q{{ loop.parent.index0 }}" value="{{ opt }}" required>
+        <input class="form-check-input" type="radio" name="q{{ loop.index0 }}" value="{{ opt }}" required>
         <label class="form-check-label">{{ opt }}</label>
       </div>
       {% endfor %}
