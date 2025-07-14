@@ -124,10 +124,10 @@ def report():
     pdf.cell(0, 10, "LinkedIn: https://linkedin.com/company/digitalxforce", ln=True)
     pdf.cell(0, 10, "Website: https://digitalxforce.com", ln=True)
 
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    pdf_output.seek(0)
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
+    pdf_output = BytesIO(pdf_bytes)
     return send_file(pdf_output, download_name="Cybersecurity_Report.pdf", as_attachment=True)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
